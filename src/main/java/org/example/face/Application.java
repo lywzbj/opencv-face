@@ -26,7 +26,7 @@ public class Application {
             if (!frame.empty()) {
                 // Save the frame as an image every 5 seconds
                 if (frameCount % 150 == 0) {  // 30 frames per second, so 150 frames ≈ 5 seconds
-                    String filename = "frame_" + frameCount + ".png";
+                    String filename =  "D:\\tmp\\frame_" + frameCount + ".png";
                     Imgcodecs.imwrite(filename, frame);
                     System.out.println("Saved: " + filename);
                 }

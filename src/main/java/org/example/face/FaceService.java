@@ -7,6 +7,7 @@ import com.arcsoft.face.enums.ErrorInfo;
 import com.arcsoft.face.toolkit.ImageInfo;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class FaceService {
 
 
     static {
-        faceEngine = new FaceEngine("C:\\develop\\lib\\WIN64");
+        faceEngine = new FaceEngine("E:\\tmp\\ArcSoft_ArcFace_Java_Windows_x64_V3.0\\libs\\WIN64");
         //激活引擎
         int errorCode = faceEngine.activeOnline(appKey, appSecret);
 
@@ -90,6 +91,54 @@ public class FaceService {
         }
         return faceFeature.getFeatureData();
     }
+
+    public static void main(String[] args) {
+        ImageInfo imageInfo = getRGBData(new File("E:\\tmp\\frame_1200.png"));
+        ImageInfo imageInfo1 = getRGBData(new File("E:\\tmp\\WIN_20211130_22_18_42_Pro.jpg"));
+
+
+        List<FaceInfo> faceInfoList = new ArrayList<FaceInfo>();
+        List<FaceInfo> faceInfoList1 = new ArrayList<FaceInfo>();
+         faceEngine.detectFaces(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList);
+        faceEngine.detectFaces(imageInfo1.getImageData(), imageInfo1.getWidth(), imageInfo1.getHeight(), imageInfo1.getImageFormat(), faceInfoList1);
+
+
+        FaceFeature faceFeature = new FaceFeature();
+         faceEngine.extractFaceFeature(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList.get(0), faceFeature);
+        System.out.println("特征值大小：" + faceFeature.getFeatureData().length);
+
+
+
+        FaceFeature faceFeature1 = new FaceFeature();
+        faceEngine.extractFaceFeature(imageInfo1.getImageData(), imageInfo1.getWidth(), imageInfo1.getHeight(), imageInfo1.getImageFormat(), faceInfoList1.get(0), faceFeature1);
+        System.out.println("特征值大小：" + faceFeature.getFeatureData().length);
+
+        System.out.println(isSeem(faceFeature.getFeatureData(),faceFeature1.getFeatureData()));
+
+    }
+
+
+
+    public static boolean isSeem(byte[] b1,byte[] b2) {
+        FaceFeature targetFaceFeature = new FaceFeature(b1);
+        FaceFeature faceFeature = new FaceFeature(b2);
+        FaceSimilar similar = new FaceSimilar();
+
+        int i = faceEngine.compareFaceFeature(targetFaceFeature, faceFeature, similar);
+        if(ErrorInfo.MOK.getValue() != i) {
+            System.out.println("特征比对失败");
+            return false;
+        }
+        float score = similar.getScore();
+        return score >= 0.7;
+    }
+
+
+
+
+
+
+
 
 }
 

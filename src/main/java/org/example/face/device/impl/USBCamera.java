@@ -1,6 +1,7 @@
 package org.example.face.device.impl;
 
 import com.arcsoft.face.FaceInfo;
+import com.arcsoft.face.toolkit.ImageInfo;
 import org.example.face.FaceService;
 import org.example.face.device.ICamera;
 import org.example.face.fileserver.service.ImageServerService;
@@ -14,8 +15,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.arcsoft.face.toolkit.ImageFactory.getRGBData;
 
 public class USBCamera implements ICamera {
 
@@ -29,6 +33,24 @@ public class USBCamera implements ICamera {
 
 
     private ImageServerService serverService = new ImageServerServiceImpl();
+
+
+    public USBCamera() {
+        initAdmin();
+    }
+
+    private byte[] adminFace;
+
+
+
+
+    private void initAdmin() {
+        ImageInfo imageInfo1 = getRGBData(new File("E:\\tmp\\WIN_20211130_22_18_42_Pro.jpg"));
+        adminFace = FaceService.getFace(imageInfo1);
+    }
+
+
+
 
 
 
@@ -55,8 +77,17 @@ public class USBCamera implements ICamera {
                         FaceInfo face = FaceService.isFace(bytes);
                         if(face != null) {
                             try {
-                                String save = serverService.save(bytes);
-                                System.out.println("检测到人脸信息,保存文件: " + save);
+
+                                // 提前特征值，比对白名单
+                                byte[] bytes1 = FaceService.getFace(bytes, face);
+
+                                boolean seem = FaceService.isSeem(adminFace, bytes1);
+                                if(seem) {
+                                    System.out.println("当前人脸信息处于白名单中,不做保存");
+                                } else {
+                                    String save = serverService.save(bytes);
+                                    System.out.println("检测到人脸信息,保存文件: " + save);
+                                }
                             }catch (Exception e) {
                                 System.out.println("人脸信息保存失败: " + e.getMessage());
                             }

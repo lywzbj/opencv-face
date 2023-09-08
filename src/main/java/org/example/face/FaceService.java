@@ -92,28 +92,35 @@ public class FaceService {
         return faceFeature.getFeatureData();
     }
 
+
+    public static byte[]  getFace(ImageInfo imageInfo) {
+        List<FaceInfo> faceInfoList1 = new ArrayList<FaceInfo>();
+        int detectFaces = faceEngine.detectFaces(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList1);
+        if(ErrorInfo.MOK.getValue() != detectFaces) {
+            throw new RuntimeException("该图片中没有人脸信息");
+        }
+        FaceFeature faceFeature1 = new FaceFeature();
+        faceEngine.extractFaceFeature(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList1.get(0), faceFeature1);
+        return faceFeature1.getFeatureData();
+    }
+
+
+
     public static void main(String[] args) {
-        ImageInfo imageInfo = getRGBData(new File("E:\\tmp\\frame_1200.png"));
+
         ImageInfo imageInfo1 = getRGBData(new File("E:\\tmp\\WIN_20211130_22_18_42_Pro.jpg"));
 
 
         List<FaceInfo> faceInfoList = new ArrayList<FaceInfo>();
         List<FaceInfo> faceInfoList1 = new ArrayList<FaceInfo>();
-         faceEngine.detectFaces(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList);
+
         faceEngine.detectFaces(imageInfo1.getImageData(), imageInfo1.getWidth(), imageInfo1.getHeight(), imageInfo1.getImageFormat(), faceInfoList1);
-
-
-        FaceFeature faceFeature = new FaceFeature();
-         faceEngine.extractFaceFeature(imageInfo.getImageData(), imageInfo.getWidth(), imageInfo.getHeight(), imageInfo.getImageFormat(), faceInfoList.get(0), faceFeature);
-        System.out.println("特征值大小：" + faceFeature.getFeatureData().length);
-
-
 
         FaceFeature faceFeature1 = new FaceFeature();
         faceEngine.extractFaceFeature(imageInfo1.getImageData(), imageInfo1.getWidth(), imageInfo1.getHeight(), imageInfo1.getImageFormat(), faceInfoList1.get(0), faceFeature1);
-        System.out.println("特征值大小：" + faceFeature.getFeatureData().length);
 
-        System.out.println(isSeem(faceFeature.getFeatureData(),faceFeature1.getFeatureData()));
+
+
 
     }
 

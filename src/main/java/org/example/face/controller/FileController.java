@@ -1,19 +1,34 @@
 package org.example.face.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.face.fileserver.service.ImageServerService;
+import org.example.face.fileserver.service.ImageServerServiceImpl;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/api/file")
 public class FileController {
 
 
+    private ImageServerService imageServerService =  new ImageServerServiceImpl();
 
-    @GetMapping(value = "/test")
-    public String test() {
-        return "success";
+
+
+    @PostMapping(value = "/updateImage")
+    public String updateImage(@RequestParam("file") MultipartFile file) {
+        if(file.isEmpty()) {
+            return "请指定要上传的图片";
+        }
+        try {
+            byte[] bytes = file.getBytes();
+            return imageServerService.save(bytes);
+        } catch (IOException e) {
+           return e.getMessage();
+        }
     }
+
 
 
 

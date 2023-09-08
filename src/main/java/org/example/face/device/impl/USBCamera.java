@@ -3,6 +3,8 @@ package org.example.face.device.impl;
 import com.arcsoft.face.FaceInfo;
 import org.example.face.FaceService;
 import org.example.face.device.ICamera;
+import org.example.face.fileserver.service.ImageServerService;
+import org.example.face.fileserver.service.ImageServerServiceImpl;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -25,6 +27,8 @@ public class USBCamera implements ICamera {
     //  0 - 停止   1 - 运行中
     private AtomicInteger status =  new AtomicInteger(0);
 
+
+    private ImageServerService serverService = new ImageServerServiceImpl();
 
 
 
@@ -50,11 +54,12 @@ public class USBCamera implements ICamera {
                         byte[] bytes = bufferedImageToByteArray(image);
                         FaceInfo face = FaceService.isFace(bytes);
                         if(face != null) {
-                            Imgcodecs.imwrite(filename, frame);
-                            System.out.println("检测到人脸信息,保存文件: " + filename);
-                            byte[] faceBytes = FaceService.getFace(bytes, face);
-                            System.out.println("提取到人脸特征值: " + faceBytes);
-
+                            try {
+                                String save = serverService.save(bytes);
+                                System.out.println("检测到人脸信息,保存文件: " + save);
+                            }catch (Exception e) {
+                                System.out.println("人脸信息保存失败: " + e.getMessage());
+                            }
                         }
 
                     }
